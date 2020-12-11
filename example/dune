@@ -1,0 +1,4 @@
+(executable
+ (name test)
+ (flags -runtime-variant _pic)
+ (modes (native object)))
