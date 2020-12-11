@@ -1,4 +1,4 @@
-open Bindings
+open Weechat_api.Bindings
 
 let weechat_plugin_init () =
   let buffer = weechat_current_buffer () in

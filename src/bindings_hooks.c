@@ -1,27 +1,12 @@
 #include "bindings.h"
 
+#include <weechat/weechat-plugin.h> /* weechat_* */
+
 #define CAML_NAME_SPACE
 #include <caml/mlvalues.h> /* value */
 #include <caml/memory.h> /* CAMLparamX, CAMLreturn */
 #include <caml/custom.h> /* custom_* */
 
-#include <weechat/weechat-plugin.h>
-
-/*
- * 3.14 Hooks
- */
-
-value caml_weechat_command(value buffer, value cmd) {
-  CAMLparam2(buffer, cmd);
-
-  weechat_command(NULL, String_val(cmd));
-
-  CAMLreturn(Val_int(0));
-}
-
-/*
- * 3.15 Buffers
- */
 
 static struct custom_operations gui_buffer_ops = {
  .identifier = "fr.boloss.weechat.gui_buffer",

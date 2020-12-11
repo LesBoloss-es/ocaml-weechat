@@ -1,0 +1,6 @@
+(executable
+ (name plugin)
+ (flags -runtime-variant _pic)
+ (modes (native object))
+ (modules Plugin)
+ (libraries weechat_api))

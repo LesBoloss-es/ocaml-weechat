@@ -1,6 +1,0 @@
-(executable
- (name plugin)
- (flags -runtime-variant _pic)
- (foreign_stubs (language c)
-  (names bindings))
- (modes (native object)))
