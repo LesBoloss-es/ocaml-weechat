@@ -2,7 +2,7 @@ CC = cc
 CFLAGS = -Wall -Wextra -pedantic -Wmissing-prototypes \
 				 -I$(shell ocamlc -where)
 
-plugin.so: plugin.o plugin.ml dune
+plugin.so: plugin.o plugin.ml ../src
 	dune build ./plugin.exe.o
 	$(CC) $(CFLAGS) -o $@ -shared plugin.o ../_build/default/example/plugin.exe.o
 

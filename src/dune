@@ -1,4 +1,4 @@
 (library
  (name weechat_api)
  (foreign_stubs (language c)
-  (names bindings_hooks bindings_buffers)))
+  (names bindings_buffers bindings_commands)))

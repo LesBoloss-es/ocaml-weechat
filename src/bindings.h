@@ -9,18 +9,14 @@
 /* The global plugin pointer must be declared in the client code */
 extern struct t_weechat_plugin *weechat_plugin;
 
-/*
- * 3.14 Hooks
- */
-
-value caml_weechat_command(value buffer, value cmd);
-
-/*
- * 3.15 Buffers
- */
+/* 15. Buffers */
 
 #define gui_buffer_unbox(block) (*(struct t_gui_buffer**)Data_custom_val(block))
 
 value caml_weechat_current_buffer(value unit);
+
+/* 19. Commands */
+
+value caml_weechat_command(value buffer, value cmd);
 
 #endif
