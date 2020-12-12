@@ -8,7 +8,7 @@
 #include <caml/custom.h> /* custom_* */
 
 
-static struct custom_operations gui_buffer_ops = {
+struct custom_operations gui_buffer_ops = {
  .identifier = "fr.boloss.weechat.gui_buffer",
  .finalize = custom_finalize_default,
  .compare = custom_compare_default,

@@ -10,7 +10,7 @@
 value caml_weechat_command(value buffer, value cmd) {
   CAMLparam2(buffer, cmd);
 
-  weechat_command(NULL, String_val(cmd));
+  int rc = weechat_command(NULL, String_val(cmd));
 
-  CAMLreturn(Val_int(0));
+  CAMLreturn(Val_int(rc));
 }
