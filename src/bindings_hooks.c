@@ -9,6 +9,44 @@
 #include <caml/callback.h> /* caml_callback */
 #include <caml/alloc.h> /* caml_copy_string */
 
+struct t_hashtable *hook_table = NULL;
+
+
+static struct t_hashtable_item*
+add_hook_to_table(const struct t_hook* hook, value *closure) {
+  if (hook_table == NULL)
+    weechat_hashtable_new(
+      32, WEECHAT_HASHTABLE_POINTER, WEECHAT_HASHTABLE_POINTER, NULL, NULL
+    );
+
+  caml_register_global_root(closure);
+  return weechat_hashtable_set(hook_table, hook, closure);
+}
+
+void remove_hook_from_table(const struct t_hook* hook) {
+  if (hook_table == NULL) return;
+
+  value* closure = weechat_hashtable_get(hook_table, hook);
+  if (closure) caml_remove_global_root(closure);
+
+  weechat_hashtable_remove(hook_table, hook);
+}
+
+static void hook_table_clear_callback(void* data,
+                                      struct t_hashtable *ht,
+                                      const void *key,
+                                      const void *closure) {
+  (void)data;
+  (void)ht;
+  (void)key;
+  caml_remove_global_root((value*)closure);
+}
+
+void hook_table_clear() {
+  weechat_hashtable_map(hook_table, hook_table_clear_callback, NULL);
+  weechat_hashtable_free(hook_table);
+}
+
 static struct custom_operations hook_ops = {
  .identifier = "fr.boloss.weechat.hook",
  .finalize = custom_finalize_default,
@@ -53,17 +91,12 @@ value caml_weechat_hook_command_native(value command,
                                        value callback) {
   CAMLparam5(command, description, args, args_description, completion);
   CAMLxparam1(callback);
+
   CAMLlocal1(hook);
-
-  /* XXX. This is leaky!
-   * When we bind the weechat_unhook and weechat_unhook_all functions we must
-   * store this pointer somewhere (a global hashtable?) and ensure that it is
-   * freed when the the hook is removed. */
-  value *closure_ptr = malloc(sizeof(value));
-  caml_register_global_root(closure_ptr);
-  *closure_ptr = callback;
-
   hook = caml_alloc_custom(&hook_ops, sizeof(struct t_hook*), 0, 1);
+
+  value *closure_ptr = malloc(sizeof(value));
+  *closure_ptr = callback;
   hook_unbox(hook) = weechat_hook_command(String_val(command),
                                           String_val(description),
                                           String_val(args),
@@ -72,6 +105,7 @@ value caml_weechat_hook_command_native(value command,
                                           __generic_command_callback,
                                           closure_ptr,
                                           NULL);
+  add_hook_to_table(hook_unbox(hook), closure_ptr);
 
   CAMLreturn(hook);
 }
@@ -80,4 +114,12 @@ value caml_weechat_hook_command_bytecode(value *argv, int argc) {
   (void)argc;
   return caml_weechat_hook_command_native(argv[0], argv[1], argv[2], argv[3],
                                           argv[4], argv[5]);
+}
+
+value caml_weechat_unhook(value bhook) {
+  CAMLparam1(bhook);
+  struct t_hook *hook = hook_unbox(bhook);
+  weechat_unhook(hook);
+  remove_hook_from_table(hook);
+  CAMLreturn(Val_int(0));
 }

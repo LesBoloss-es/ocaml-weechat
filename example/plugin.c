@@ -36,5 +36,9 @@ int weechat_plugin_init(struct t_weechat_plugin *plugin,
 
 int weechat_plugin_end (struct t_weechat_plugin *plugin) {
   (void) plugin;
+
+  /* Let us perform some cleanups from OCaml */
+  caml_callback(*caml_named_value("weechat_plugin_end"), Val_int(0));
+
   return WEECHAT_RC_OK;
 }

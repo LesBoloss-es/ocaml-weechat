@@ -10,23 +10,25 @@ let shrug buffer _ _ =
   Weechat.command buffer "¯\\_(ツ)_/¯"
 
 let weechat_plugin_init () =
-  let _ = Weechat.hook_command
-    "ocamlsay"
-    "Say something from OCaml"
-    "msg"
-    "msg: the message to say"
+  let say_hook = Weechat.hook_command
+    "ocamlsay" "Say something from OCaml"
+    "msg" "msg: the message to say"
     ""
     say
   in
   let _ = Weechat.hook_command
+    "ocamlshutup"
+    "Disable the /ocamlsay command"
+    "" "" ""
+    (fun _ _ _ -> Weechat.unhook say_hook; 1)
+  in
+  let _ = Weechat.hook_command
     "shrug"
     "print a shrug emoji in the current buffer"
-    ""
-    ""
-    ""
-    shrug
+    "" "" "" shrug
   in
   ()
 
 let () =
-  Callback.register "weechat_plugin_init" weechat_plugin_init
+  Callback.register "weechat_plugin_init" weechat_plugin_init;
+  Callback.register "weechat_plugin_end" Weechat.plugin_end

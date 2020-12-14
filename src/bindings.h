@@ -11,8 +11,8 @@ extern struct t_weechat_plugin *weechat_plugin;
 
 /* 14. Hooks */
 
-typedef int (*__weechat_command_callback_t)
-            (const void*, void*, struct t_gui_buffer*, int, char**, char**);
+extern struct t_hashtable *hook_table;
+void hook_table_clear();
 
 #define hook_unbox(block) (*(struct t_hook**) Data_custom_val(block))
 
