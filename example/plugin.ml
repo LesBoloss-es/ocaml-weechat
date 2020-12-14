@@ -9,7 +9,7 @@ let say buffer _ argv_eol =
 let shrug buffer _ _ =
   Weechat.command buffer "¯\\_(ツ)_/¯"
 
-let weechat_plugin_init () =
+let plugin_init () =
   let say_hook = Weechat.hook_command
     "ocamlsay" "Say something from OCaml"
     "msg" "msg: the message to say"
@@ -18,7 +18,7 @@ let weechat_plugin_init () =
   in
   let _ = Weechat.hook_command
     "ocamlshutup"
-    "Disable the /ocamlsay command"
+    "Disable the /ocamlsay command definitively"
     "" "" ""
     (fun _ _ _ -> Weechat.unhook say_hook; 1)
   in
@@ -30,5 +30,6 @@ let weechat_plugin_init () =
   ()
 
 let () =
-  Callback.register "weechat_plugin_init" weechat_plugin_init;
-  Callback.register "weechat_plugin_end" Weechat.plugin_end
+  Weechat_plugin.define
+    ~plugin_init:plugin_init
+    ~plugin_end:Weechat.plugin_end

@@ -1,0 +1,9 @@
+(library
+ (name weechat_plugin)
+ (public_name weechat.plugin)
+ (foreign_stubs (language c)
+  (names plugin_boilerplate)))
+
+(install
+ (files (plugin_boilerplate.o as plugin/plugin_boilerplate.o))
+ (section lib))

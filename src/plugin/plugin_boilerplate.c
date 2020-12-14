@@ -7,12 +7,6 @@
 #include <caml/callback.h>
 #include <caml/alloc.h>
 
-WEECHAT_PLUGIN_NAME("ocaml-test")
-WEECHAT_PLUGIN_DESCRIPTION("OCaml test plugin for WeeChat")
-WEECHAT_PLUGIN_AUTHOR("Martin Pépin <kerl@wkerl.me>")
-WEECHAT_PLUGIN_VERSION("0.1")
-WEECHAT_PLUGIN_LICENSE("GPL3")
-
 struct t_weechat_plugin *weechat_plugin = NULL;
 
 int weechat_plugin_init(struct t_weechat_plugin *plugin,
@@ -29,7 +23,7 @@ int weechat_plugin_init(struct t_weechat_plugin *plugin,
   weechat_plugin = plugin;
 
   /* Give the control to OCaml. */
-  caml_callback(*caml_named_value("weechat_plugin_init"), Val_int(0));
+  caml_callback(*caml_named_value("caml_weechat_plugin_init"), Val_unit);
 
   return WEECHAT_RC_OK;
 }
@@ -38,7 +32,7 @@ int weechat_plugin_end (struct t_weechat_plugin *plugin) {
   (void) plugin;
 
   /* Let us perform some cleanups from OCaml */
-  caml_callback(*caml_named_value("weechat_plugin_end"), Val_int(0));
+  caml_callback(*caml_named_value("caml_weechat_plugin_end"), Val_unit);
 
   return WEECHAT_RC_OK;
 }
