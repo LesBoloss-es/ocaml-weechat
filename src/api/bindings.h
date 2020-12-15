@@ -9,10 +9,8 @@
 /* The global plugin pointer must be declared in the client code */
 extern struct t_weechat_plugin *weechat_plugin;
 
-/* 14. Hooks */
 
-extern struct t_hashtable *hook_table;
-void hook_table_clear();
+/* 14. Hooks */
 
 #define hook_unbox(block) (*(struct t_hook**) Data_custom_val(block))
 
@@ -23,9 +21,11 @@ value caml_weechat_hook_command(value command,
                                 value completion,
                                 value callback);
 
+
 /* 13. Display */
 
 value caml_weechat_printf(value buffer, value message);
+
 
 /* 15. Buffers */
 
@@ -35,8 +35,18 @@ extern struct custom_operations gui_buffer_ops;
 value caml_weechat_buffer_new(value name, value input_cb, value close_cb);
 value caml_weechat_current_buffer(value unit);
 
+
 /* 19. Commands */
 
 value caml_weechat_command(value buffer, value cmd);
+
+
+/* Extra stuff */
+
+extern struct t_hashtable *__caml_closure_table;
+
+struct t_hashtable_item *__caml_closure_table_set(const void *key, value *closure);
+void __caml_closure_table_remove(const void *key);
+void __caml_closure_table_free();
 
 #endif

@@ -9,43 +9,6 @@
 #include <caml/callback.h> /* caml_callback */
 #include <caml/alloc.h> /* caml_copy_string */
 
-struct t_hashtable *hook_table = NULL;
-
-
-static struct t_hashtable_item*
-add_hook_to_table(const struct t_hook* hook, value *closure) {
-  if (hook_table == NULL)
-    weechat_hashtable_new(
-      32, WEECHAT_HASHTABLE_POINTER, WEECHAT_HASHTABLE_POINTER, NULL, NULL
-    );
-
-  caml_register_global_root(closure);
-  return weechat_hashtable_set(hook_table, hook, closure);
-}
-
-void remove_hook_from_table(const struct t_hook* hook) {
-  if (hook_table == NULL) return;
-
-  value* closure = weechat_hashtable_get(hook_table, hook);
-  if (closure) caml_remove_global_root(closure);
-
-  weechat_hashtable_remove(hook_table, hook);
-}
-
-static void hook_table_clear_callback(void* data,
-                                      struct t_hashtable *ht,
-                                      const void *key,
-                                      const void *closure) {
-  (void)data;
-  (void)ht;
-  (void)key;
-  caml_remove_global_root((value*)closure);
-}
-
-void hook_table_clear() {
-  weechat_hashtable_map(hook_table, hook_table_clear_callback, NULL);
-  weechat_hashtable_free(hook_table);
-}
 
 static struct custom_operations hook_ops = {
  .identifier = "fr.boloss.weechat.hook",
@@ -105,7 +68,7 @@ value caml_weechat_hook_command_native(value command,
                                           __generic_command_callback,
                                           closure_ptr,
                                           NULL);
-  add_hook_to_table(hook_unbox(hook), closure_ptr);
+  __caml_closure_table_set(hook_unbox(hook), closure_ptr);
 
   CAMLreturn(hook);
 }
@@ -120,6 +83,6 @@ value caml_weechat_unhook(value bhook) {
   CAMLparam1(bhook);
   struct t_hook *hook = hook_unbox(bhook);
   weechat_unhook(hook);
-  remove_hook_from_table(hook);
+  __caml_closure_table_remove(hook);
   CAMLreturn(Val_int(0));
 }
