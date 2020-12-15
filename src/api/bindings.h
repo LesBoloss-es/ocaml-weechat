@@ -20,6 +20,8 @@ value caml_weechat_hook_command(value command,
                                 value args_description,
                                 value completion,
                                 value callback);
+value caml_weechat_hook_fd(value fd, value flag_read, value flag_write, value callback);
+value caml_weechat_unhook(value hook);
 
 
 /* 13. Display */

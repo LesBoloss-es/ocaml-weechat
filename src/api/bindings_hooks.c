@@ -79,6 +79,33 @@ value caml_weechat_hook_command_bytecode(value *argv, int argc) {
                                           argv[4], argv[5]);
 }
 
+
+int __generic_fd_callback(const void *pointer, void *closure, int fd) {
+  CAMLparam0();
+  CAMLlocal1(bres);
+  (void)pointer;
+  bres = caml_callback(*((value*)closure), Val_int(fd));
+  CAMLreturn(Int_val(bres));
+}
+
+value caml_weechat_hook_fd(value fd, value flag_read, value flag_write,
+                           value callback) {
+  CAMLparam4(fd, flag_read, flag_write, callback);
+  CAMLlocal1(hook);
+  hook = caml_alloc_custom(&hook_ops, sizeof(struct t_hook*), 0, 1);
+
+  value *closure_ptr = malloc(sizeof(value));
+  *closure_ptr = callback;
+  hook_unbox(hook) = weechat_hook_fd(Int_val(fd),
+                                     Int_val(flag_read), Int_val(flag_write), 0,
+                                     __generic_fd_callback,
+                                     NULL, closure_ptr);
+  __caml_closure_table_set(hook_unbox(hook), closure_ptr);
+
+  CAMLreturn(hook);
+}
+
+
 value caml_weechat_unhook(value bhook) {
   CAMLparam1(bhook);
   struct t_hook *hook = hook_unbox(bhook);

@@ -15,6 +15,8 @@ external hook_command: string -> string -> string -> string -> string
                        -> hook
                        = "caml_weechat_hook_command_bytecode"
                          "caml_weechat_hook_command_native"
+external hook_fd: int -> flag_read:bool -> flag_write:bool -> (int -> int)
+                  -> hook = "caml_weechat_hook_fd"
 external unhook: hook -> unit = "caml_weechat_unhook"
 
 (** {2 15. Buffers} *)
