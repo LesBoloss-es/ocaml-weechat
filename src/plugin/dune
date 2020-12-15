@@ -5,5 +5,7 @@
   (names plugin_boilerplate)))
 
 (install
- (files (plugin_boilerplate.o as plugin/plugin_boilerplate.o))
+ (files
+  (plugin_boilerplate.o as plugin/plugin_boilerplate.o)
+  (plugin_boilerplate.c as plugin/plugin_boilerplate.c))
  (section lib))
