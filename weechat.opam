@@ -1,0 +1,22 @@
+opam-version: "1.2"
+
+name: "weechat"
+version: "0.1"
+
+maintainer: "Kerl <kerl@wkerl.me>"
+authors: [
+  "Kerl <kerl@wkerl.me>"
+]
+license: "LGPL3"
+
+homepage: "https://github.com/LesBoloss-es/ocaml-weechat-api"
+bug-reports: "https://github.com/LesBoloss-es/ocaml-weechat-api/issues"
+dev-repo: "git://github.com/LesBoloss-es/ocaml-weechat-api.git"
+
+available: [ ocaml-version >= "4.11.1" ]
+depends: [
+  "dune" {build}
+]
+
+build: ["dune" "build" "-p" name "-j" jobs]
+build-test: ["dune" "runtest"]
