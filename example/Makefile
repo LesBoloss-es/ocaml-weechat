@@ -1,10 +1,9 @@
-.POSIX:
-
 CC = cc
 CFLAGS = -Wall -Wextra -pedantic
 DUNE = dune
 
-plugin.so: plugin.ml
+.PHONY: plugin.so
+plugin.so:
 	$(DUNE) build ./plugin.exe.o
 	$(CC) $(CFLAGS) -o $@ -shared \
 		$$($(DUNE) exec ocamlfind query weechat)/plugin/plugin_boilerplate.o \

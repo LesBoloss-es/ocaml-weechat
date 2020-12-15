@@ -1,5 +1,11 @@
 type gui_buffer
 
+(** {2 13. Display} *)
+
+external printf: gui_buffer -> string -> unit = "caml_weechat_printf"
+let printf buffer = Format.kasprintf (printf buffer)
+
+
 (** {2 14. Hooks} *)
 
 type hook
@@ -13,6 +19,11 @@ external unhook: hook -> unit = "caml_weechat_unhook"
 
 (** {2 15. Buffers} *)
 
+external buffer_new: string
+                     -> (gui_buffer -> string -> int)
+                     -> (gui_buffer -> int)
+                     -> gui_buffer
+                     = "caml_weechat_buffer_new"
 external current_buffer: unit -> gui_buffer = "caml_weechat_current_buffer"
 
 (** {2 19. Commands} *)

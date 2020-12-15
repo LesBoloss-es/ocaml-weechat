@@ -20,12 +20,19 @@ let plugin_init () =
     "ocamlshutup"
     "Disable the /ocamlsay command definitively"
     "" "" ""
-    (fun _ _ _ -> Weechat.unhook say_hook; 1)
+    (fun _ _ _ -> Weechat.unhook say_hook; 0)
   in
   let _ = Weechat.hook_command
     "shrug"
     "print a shrug emoji in the current buffer"
     "" "" "" shrug
+  in
+  let _ = Weechat.buffer_new
+    "ocaml-test"
+    (fun buffer text ->
+      Weechat.printf buffer "You just typed: %s" text;
+      0)
+    (fun _ -> 0)
   in
   ()
 

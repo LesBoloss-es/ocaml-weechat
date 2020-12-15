@@ -3,6 +3,7 @@
  (public_name weechat.api)
  (foreign_stubs (language c)
   (names
+   bindings_display
    bindings_hooks
    bindings_buffers
    bindings_commands
