@@ -80,10 +80,10 @@ value caml_weechat_hook_command_bytecode(value *argv, int argc) {
 }
 
 
-int __generic_fd_callback(const void *pointer, void *closure, int fd) {
+int __generic_fd_callback(const void *closure, void *data, int fd) {
   CAMLparam0();
   CAMLlocal1(bres);
-  (void)pointer;
+  (void)data;
   bres = caml_callback(*((value*)closure), Val_int(fd));
   CAMLreturn(Int_val(bres));
 }
@@ -99,7 +99,7 @@ value caml_weechat_hook_fd(value fd, value flag_read, value flag_write,
   hook_unbox(hook) = weechat_hook_fd(Int_val(fd),
                                      Int_val(flag_read), Int_val(flag_write), 0,
                                      __generic_fd_callback,
-                                     NULL, closure_ptr);
+                                     closure_ptr, NULL);
   __caml_closure_table_set(hook_unbox(hook), closure_ptr);
 
   CAMLreturn(hook);
