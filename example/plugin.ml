@@ -1,82 +1,74 @@
 open Weechat_api
 
-let say buffer _ argv_eol =
-  let message = argv_eol.(1) in
-  Weechat.command
-    buffer
-    (Format.sprintf "From OCaml: \"%s\"" message)
 
-let shrug buffer _ _ =
-  Weechat.command buffer "¯\\_(ツ)_/¯"
+let log = open_out "/tmp/weechat_signal.log" |> Format.formatter_of_out_channel
+let log args =
+  Format.fprintf log args
 
-let listen my_buffer socket =
-  let ic = Unix.in_channel_of_descr socket in
-  fun _ ->
-    try
-      let line = input_line ic in
-      Weechat.printf my_buffer "Read on socket: %s" line;
-      0
-    with End_of_file -> 0
 
-let listen_hook = ref None
+module Signald = struct
+  type t = {socket: Unix.file_descr; ic: in_channel}
 
-let start_listening my_buffer _ _ argv_eol =
-  let path = argv_eol.(1) in
-  let socket = Unix.socket Unix.PF_UNIX Unix.SOCK_STREAM 0 in
-  Unix.connect socket (Unix.ADDR_UNIX path);
-  let hook =Weechat.hook_fd
-    (Obj.magic socket)
-    ~flag_read:true
-    ~flag_write:false
-    (listen my_buffer socket)
+  let make socket =
+    let ic = Unix.in_channel_of_descr socket in
+    {socket; ic}
+
+  let send t =
+    Format.kasprintf
+      (fun s -> log "Sending: %s@." s;
+        let _ = Unix.write_substring t.socket s 0 (String.length s) in
+        ())
+
+  let subscribe t (number: string) =
+    send t {|{"type": "subscribe", "username": %s}|} number
+
+  let close t = close_in t.ic
+end
+
+let init_signald path =
+  let socket = Unix.(socket PF_UNIX SOCK_STREAM 0) in
+  let rec try_connect retry =
+    try Unix.connect socket (Unix.ADDR_UNIX path)
+    with Unix.Unix_error _ ->
+      log "Could not connect to socket %s, retrying in %d seconds@." path retry;
+      Unix.sleep retry;
+      try_connect (retry + 1)
   in
-  listen_hook := Some (hook);
+  try_connect 1;
+  Signald.make socket
+
+let process_line main_buffer line =
+  (* Match on line["type"] here *)
+  Weechat.printf main_buffer "Unhandled input: %s" line;
   0
 
 let plugin_init () =
-  let my_buffer = Weechat.buffer_new
-    "ocaml-test"
-    (fun buffer text ->
-      Weechat.printf buffer "You just typed: %s" text;
+  let signald_buffer = Weechat.buffer_new
+    "signald"
+    (fun buffer _ ->
+      Weechat.printf buffer "[This is a readonly buffer]";
       0)
     (fun _ -> 0)
   in
 
-  let say_hook = Weechat.hook_command
-    "ocamlsay" "Say something from OCaml"
-    "msg" "msg: the message to say"
+  let signald = init_signald "/run/signald/signald.sock" in
+
+  let _ = Weechat.hook_command
+    "signalsub"
+    "Start receiving messages for a given number"
+    "number"
+    "number: phone number for which to receive messages"
     ""
-    say
+    (fun _ argv _ -> Signald.subscribe signald argv.(1); 0)
   in
 
-  let _ = Weechat.hook_command
-    "ocamlshutup"
-    "Disable the /ocamlsay command definitively"
-    "" "" ""
-    (fun _ _ _ -> Weechat.unhook say_hook; 0)
-  in
-
-  let _ = Weechat.hook_command
-    "shrug"
-    "print a shrug emoji in the current buffer"
-    "" "" "" shrug
-  in
-
-  let _ = Weechat.hook_command
-    "ocamllisten"
-    "start listening on a unix socket"
-    "sock_addr" "sock_addr: address of the unix socket" "%(filename)"
-    (start_listening my_buffer)
-  in
-
-  let _ = Weechat.hook_command
-    "ocamlstoplistening"
-    "stop listening on the unix socket"
-    "" "" ""
-    (fun _ _ _ ->
-      match !listen_hook with
-        | Some hook -> Weechat.unhook hook; 0
-        | None -> 0)
+  let _ = Weechat.hook_fd
+    (Obj.magic signald.socket)
+    ~flag_read:true
+    ~flag_write:false
+    (fun _ ->
+      try process_line signald_buffer (input_line signald.ic)
+      with End_of_file -> 0)
   in
 
   ()
