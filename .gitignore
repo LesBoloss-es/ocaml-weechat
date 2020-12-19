@@ -2,3 +2,4 @@
 .merlin
 *.o
 *.so
+*.opam
