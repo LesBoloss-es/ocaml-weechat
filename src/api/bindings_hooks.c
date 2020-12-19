@@ -64,7 +64,7 @@ value caml_weechat_hook_command_native(value command,
                                           String_val(description),
                                           String_val(args),
                                           String_val(args_description),
-                                          String_val(description),
+                                          String_val(completion),
                                           __generic_command_callback,
                                           closure_ptr,
                                           NULL);
