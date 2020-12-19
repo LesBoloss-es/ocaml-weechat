@@ -6,4 +6,4 @@
   (language c)
   (names description)
   (flags -fPIC))
- (libraries weechat_api weechat_plugin unix))
+ (libraries weechat_api weechat_plugin unix yojson))
