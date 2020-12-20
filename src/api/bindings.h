@@ -26,6 +26,7 @@ value caml_weechat_unhook(value hook);
 
 /* 13. Display */
 
+value caml_weechat_prefix(value prefix);
 value caml_weechat_printf(value buffer, value message);
 
 

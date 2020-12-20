@@ -2,6 +2,7 @@ type gui_buffer
 
 (** {2 13. Display} *)
 
+external prefix: string -> string option = "caml_weechat_prefix"
 external printf: gui_buffer -> string -> unit = "caml_weechat_printf"
 let printf buffer = Format.kasprintf (printf buffer)
 
