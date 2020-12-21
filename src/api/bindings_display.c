@@ -13,6 +13,12 @@ value caml_weechat_prefix(value prefix) {
   CAMLreturn(res);
 }
 
+value caml_weechat_color(value color_name) {
+  CAMLparam1(color_name);
+  CAMLlocal1(res);
+  res = caml_copy_string(weechat_color(String_val(color_name)));
+  CAMLreturn(res);
+}
 
 value caml_weechat_printf(value buffer, value message) {
   CAMLparam2(buffer, message);
