@@ -9,13 +9,7 @@
 value caml_weechat_prefix(value prefix) {
   CAMLparam1(prefix);
   CAMLlocal1(res);
-  const char* p = weechat_prefix(String_val(prefix));
-  if (p) {
-    res = caml_alloc(1, 0);
-    Store_field(res, 0, caml_copy_string(p));
-  } else {
-    res = Val_int(0);
-  }
+  res = caml_copy_string(weechat_prefix(String_val(prefix)));
   CAMLreturn(res);
 }
 
